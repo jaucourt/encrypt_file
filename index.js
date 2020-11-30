@@ -1,5 +1,6 @@
 import aesjs from 'aes-js'
 import fs from 'fs'
+import crypto from 'crypto'
 
 const AES_KEY = 'snortingBuffaloWyldThingGruffalo'
 const BUFFER_ENCRYPTION = 'utf16le'
@@ -17,12 +18,11 @@ const getKey = (aesKey, encryption) => {
 }
 
 const encodeFile = (key, inputFileName, outputFileName) => {
+  const iv = Buffer.from(crypto.randomBytes(16))
+  const cipher = crypto.createCipheriv('aes-256-cbc', AES_KEY, iv)
   const text = fs.readFileSync(inputFileName, { encoding: 'utf-8' })
-  const aesCtr = new aesjs.ModeOfOperation.ctr(key)
-  const textBytes = aesjs.utils.utf8.toBytes(text)
-  const encryptedBytes = aesCtr.encrypt(textBytes)
-  const encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
-  fs.writeFileSync(outputFileName, encryptedHex, { encoding: 'utf-8' })
+  const output = `${cipher.update(text, 'utf-8', 'base64')}${cipher.final('base64')}`
+  fs.writeFileSync(outputFileName, output, { encoding: 'utf-8' })
 }
 
-encodeFile(getKey(AES_KEY, BUFFER_ENCRYPTION), './sample_text', './sample_text_encoded')
+encodeFileNew(AES_KEY, './sample_text', './sample_text_encoded-new')
