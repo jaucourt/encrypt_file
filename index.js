@@ -2,7 +2,7 @@ import openpgp from 'openpgp'
 import fs from 'fs'
 
 const passphrase = 'snortingBuffaloWyldThingGruffalo'
-const fileToEncode = 'sample_text'
+const fileToEncode = 'sample_data'
 
 const generateKeys = async () => {
   const { privateKeyArmored, publicKeyArmored } = await openpgp.generateKey({
@@ -11,43 +11,33 @@ const generateKeys = async () => {
     passphrase,
   })
   console.log(privateKeyArmored)
-  console.log(publicKeyArmored)  
+  console.log(publicKeyArmored)
 }
 
-const privateKey = fs.readFileSync('sample_private.key', {encoding: 'utf8'})
-const publicKey = fs.readFileSync('sample_public.key', {encoding: 'utf8'})
-
-// const encodeFile = (key, inputFileName, outputFileName) => {
-//   const iv = 'qwertyuiop123456' // Buffer.from(crypto.randomBytes(16))
-//   const cipher = crypto.createCipheriv('aes-256-cbc', AES_KEY, iv)
-//   const text = fs.readFileSync(inputFileName, { encoding: 'utf8' })
-//   const output = `${cipher.update(text, 'utf8', 'base64')}${cipher.final('base64')}`
-//   fs.writeFileSync(outputFileName, output, { encoding: 'utf8' })
-// }
-
-// encodeFile(AES_KEY, './sample_text', './sample_text_encoded')
+const privateKey = await openpgp.readKey({ armoredKey: fs.readFileSync('sample_private.key', {encoding: 'utf8'}) })
+const publicKey = await openpgp.readKey({ armoredKey: fs.readFileSync('sample_public.key', {encoding: 'utf8'}) }) 
 
 const encodeFile = async () => {
-  const plainData = fs.readFileSync(fileToEncode);
+  const plainData = fs.readFileSync(`${fileToEncode}.csv`);
   const encrypted = await openpgp.encrypt({
-    message: openpgp.message.fromText(plainData),
-    publicKeys: (await openpgp.key.readArmored(publicKey)).keys,
+    message: openpgp.Message.fromText(plainData),
+    publicKeys: publicKey
   });
-  
-  fs.writeFileSync(`${fileToEncode}_encoded`, encrypted.data);
+
+  fs.writeFileSync(`${fileToEncode}_encoded`, encrypted);
+  console.log(`wrote file ${fileToEncode}_encoded`)
 }
 
 const decodeFile = async () => {
-  const { keys: [pk] } = (await openpgp.key.readArmored([privateKey]))
-  await pk.decrypt(passphrase);
+  await privateKey.decrypt(passphrase);
 
   const encryptedData = fs.readFileSync(`${fileToEncode}_encoded`);
   const decrypted = await openpgp.decrypt({
-    message: await openpgp.message.readArmored(encryptedData),
-    privateKeys: [pk],
+    message: await openpgp.readMessage({ armoredMessage: encryptedData }),
+    privateKeys: privateKey
   });
 
-  fs.writeFileSync(`${fileToEncode}_decoded`, decrypted.data)
+  fs.writeFileSync(`${fileToEncode}_decoded.csv`, decrypted.data)
 }
 
 const thereAndBackAgain = async () => {
@@ -56,3 +46,4 @@ const thereAndBackAgain = async () => {
 }
 
 thereAndBackAgain()
+// encodeFile()
