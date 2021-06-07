@@ -33,7 +33,7 @@ const decodeFile = async () => {
   await privateKey.decrypt(passphrase);
 
   // const encryptedData = fs.readFileSync(`${fileToEncode}_encoded`);
-  const encryptedData = fs.readFileSync(`${fileToDecode}.json.enc`);
+  const encryptedData = fs.readFileSync(`${fileToDecode}.enc`);
   const decrypted = await openpgp.decrypt({
     message: await openpgp.readMessage({ armoredMessage: encryptedData }),
     privateKeys: privateKey
