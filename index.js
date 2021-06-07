@@ -40,7 +40,7 @@ const decodeFile = async () => {
   });
 
   // fs.writeFileSync(`${fileToEncode}_decoded.csv`, decrypted.data)
-  fs.writeFileSync(`decoded_${fileToEncode}.json`, decrypted.data)
+  fs.writeFileSync(`decoded_${fileToEncode}`, decrypted.data)
 }
 
 const thereAndBackAgain = async () => {
