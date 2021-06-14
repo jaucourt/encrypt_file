@@ -1,3 +1,4 @@
-sample_*
+sample_*.enc
+decrypted-*
 node_modules/*
 *.key

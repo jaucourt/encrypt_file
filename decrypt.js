@@ -1,9 +1,20 @@
-import crypto from 'crypto'
+import openpgp from 'openpgp'
 import fs from 'fs'
-const AES_KEY = 'snortingBuffaloWyldThingGruffalo'
 
-const iv = 'qwertyuiop123456'
-const d = crypto.createDecipheriv('aes-256-cbc', AES_KEY, iv)
-const eText = fs.readFileSync('./sample_text_encoded', { encoding: 'utf8' })
-const decrypted = `${d.update(eText, 'base64', 'utf8')}${d.final('utf8')}`
-fs.writeFileSync('./sample_text_decoded', decrypted, { encoding: 'utf8' })
+const passphrase = 'snortingBuffaloWyldThingGruffalo'
+const privateKey = await openpgp.readKey({ armoredKey: fs.readFileSync('sample_private.key', {encoding: 'utf8'}) })
+const fileToDecrypt = 'sample_data.json'
+
+const decryptFile = async () => {
+  await privateKey.decrypt(passphrase);
+
+  const encryptedData = fs.readFileSync(`${fileToDecrypt}.enc`);
+  const decrypted = await openpgp.decrypt({
+    message: await openpgp.readMessage({ armoredMessage: encryptedData }),
+    privateKeys: privateKey
+  });
+
+  fs.writeFileSync(`decrypted-${fileToDecrypt}`, decrypted.data)
+}
+
+decryptFile()
