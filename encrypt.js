@@ -7,7 +7,7 @@ const fileToEncrypt = 'sample_data.json'
 const encryptStream = async () => {
   const plainData = fs.createReadStream(fileToEncrypt);
   const encrypted = await openpgp.encrypt({
-    message: openpgp.Message.fromText(plainData),
+    message: openpgp.Message.fromBinary(plainData),
     publicKeys: publicKey
   });
 
