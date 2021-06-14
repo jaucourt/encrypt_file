@@ -5,10 +5,11 @@ const publicKey = await openpgp.readKey({ armoredKey: fs.readFileSync('public-ke
 const fileToEncrypt = 'sample_data.json'
 
 const encryptStream = async () => {
-  const plainData = fs.createReadStream(fileToEncrypt);
+  const readableStream = fs.createReadStream(fileToEncrypt);
+
   const encrypted = await openpgp.encrypt({
-    message: openpgp.Message.fromText(plainData),
-    publicKeys: publicKey
+    message: await openpgp.createMessage({ text: readableStream }),
+    encryptionKeys: publicKey
   });
 
   const ws = fs.createWriteStream(`${fileToEncrypt}.enc`)
