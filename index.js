@@ -1,6 +1,6 @@
 import openpgp from 'openpgp'
 
-const passphrase = 'snortingBuffaloWyldThingGruffalo'
+const passphrase = 'hereIsAPassphrase'
 
 const generateKeys = async () => {
   const { privateKeyArmored, publicKeyArmored } = await openpgp.generateKey({
@@ -8,6 +8,8 @@ const generateKeys = async () => {
     curve: "ed25519",
     passphrase,
   })
-  console.log(privateKeyArmored)
-  console.log(publicKeyArmored)
+  console.log('private key', privateKeyArmored)
+  console.log('public key', publicKeyArmored)
 }
+
+generateKeys()

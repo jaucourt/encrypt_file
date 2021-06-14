@@ -1,7 +1,7 @@
 import openpgp from 'openpgp'
 import fs from 'fs'
 
-const publicKey = await openpgp.readKey({ armoredKey: fs.readFileSync('sample_public.key', {encoding: 'utf8'}) }) 
+const publicKey = await openpgp.readKey({ armoredKey: fs.readFileSync('public-key.asc', {encoding: 'utf8'}) }) 
 const fileToEncrypt = 'sample_data.json'
 
 const encryptStream = async () => {
