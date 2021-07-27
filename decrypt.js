@@ -11,7 +11,8 @@ const decryptFile = async () => {
   const encryptedData = fs.readFileSync(`${fileToDecrypt}.enc`);
   const decrypted = await openpgp.decrypt({
     message: await openpgp.readMessage({ armoredMessage: encryptedData }),
-    privateKeys: privateKey
+    privateKeys: privateKey,
+    format: 'utf8'
   });
 
   fs.writeFileSync(`decrypted-${fileToDecrypt}`, decrypted.data)
